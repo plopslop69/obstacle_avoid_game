@@ -1,8 +1,9 @@
+
 const canvas = document.querySelector("canvas")
 const c = canvas.getContext("2d")
 
 // Set gravity
-const gravity = 0.2 
+const gravity = 0.25
 
 // Set canvas dimensions
 canvas.width = 1024
@@ -14,13 +15,11 @@ const groundheight = 480
 
 // Set player's movement
 const pmovespeed = 5
-const pjumpheight = 75
-const pjumpspeed = 6
+const pjumpheight = 120
+const pjumpspeed = 7
 
 let lastKey1 = null
 let lastKey2 = null
-
-
 
 resetcanvas()
 
@@ -31,6 +30,24 @@ function resetcanvas(){
     c.fillRect(0, 480, canvas.width, 20)
     c.fillStyle = '#523017'
     c.fillRect(0, 480+20, canvas.width, canvas.height)
+    c.beginPath()
+    c.fillStyle = '#ffff8a2F'
+    c.arc(200, 150, 110, 0, 2 * Math.PI)
+    c.fill()
+    c.beginPath()
+    // c.filter = "blur(2px)"
+    c.fillStyle = '#ffff8a4F'
+    c.arc(200, 150, 100, 0, 2 * Math.PI)
+    c.fill()
+    c.closePath()
+    c.beginPath()
+    c.fillStyle = '#ffef5c6F'
+    c.arc(200, 150, 90, 0, 2 * Math.PI)
+    c.fill()
+    c.beginPath()
+    c.fillStyle = '#fae62dFF'
+    c.arc(200, 150, 80, 0, 2 * Math.PI)
+    c.fill()  
 }
 
 const keys = {
@@ -62,17 +79,16 @@ class Sprite{
         
         // Setting movement boundary
 
-        if(this.position.y + this.property.height < 480){
+        if(this.position.y + this.property.height <= 480){
             this.velocity.y += gravity 
+            // this.property.isGround = false
             // Provies a {graviity} acceleration factor for each looping frame
             // setTimeout(() => {
-            //     this.property.isGround = false
             //     console.log('falseee');
             // }, 200)
         }else{
             this.velocity.y = 0
-                this.property.isGround = true
-            
+            this.property.isGround = true
         }
     }
     // move(key){
@@ -147,11 +163,9 @@ function animate(){
     // console.log('go');
     resetcanvas()
     
-    player1.update()
-    player2.update()
     
     // Player 1 Movement Controls
-        if((player1.position.x <= 0 && keys.a.pressed) || (player1.position.x + player1.property.width >= canvas.width && keys.d.pressed)){
+    if((player1.position.x <= 0 && keys.a.pressed) || (player1.position.x + player1.property.width >= canvas.width && keys.d.pressed)){
             player1.velocity.x = 0
             // This checks if the player hits the right or the left boundary and if it's still moving towards the bounday
             // If true, the player velocity is set to zero
@@ -163,7 +177,7 @@ function animate(){
                 player1.velocity.x = -pmovespeed
             }else player1.velocity.x = 0
             // console.log(player1.position.y);
-
+            
             // Jump control
             if(keys.w.pressed && player1.property.isGround){
                 if(player1.position.y >= (groundheight - player1.property.height) - pjumpheight){
@@ -174,34 +188,36 @@ function animate(){
                 }
             }
         }
-
-    // Player 2 Movement Controls
-    if((player2.position.x <= 0 && keys.left.pressed) || (player2.position.x + player2.property.width >= canvas.width && keys.right.pressed)){
+        
+        // Player 2 Movement Controls
+        if((player2.position.x <= 0 && keys.left.pressed) || (player2.position.x + player2.property.width >= canvas.width && keys.right.pressed)){
             player2.velocity.x = 0 
             console.log('p2boundary');
-    }else{
-        if(keys.right.pressed && lastKey2 == 'right'){
-            player2.velocity.x = pmovespeed
-        }else if(keys.left.pressed && lastKey2 == 'left'){
-            player2.velocity.x = -pmovespeed
-        }else player2.velocity.x = 0
-
-        if(keys.up.pressed && player2.property.isGround){
-            if(player2.position.y >= (groundheight - player2.property.height) - pjumpheight){
-                player2.velocity.y = -pjumpspeed
-            }else{
-                console.log('limitreach');
-                player2.property.isGround = false
+        }else{
+            if(keys.right.pressed && lastKey2 == 'right'){
+                player2.velocity.x = pmovespeed
+            }else if(keys.left.pressed && lastKey2 == 'left'){
+                player2.velocity.x = -pmovespeed
+            }else player2.velocity.x = 0
+            
+            if(keys.up.pressed && player2.property.isGround){
+                if(player2.position.y >= (groundheight - player2.property.height) - pjumpheight){
+                    player2.velocity.y = -pjumpspeed
+                }else{
+                    console.log('limitreach');
+                    player2.property.isGround = false
+                }
             }
         }
-    }
-
-    // Tried making a single general player control but keydown conflicts caused bugs
-    // So making do with individual repeated codes for both players (for now)
-
-    // for(i in player){
-    //     if((player[1].position.x <= 0 && keys.left.pressed) || (player[1].position.x + player[1].property.width >= canvas.width && keys.right.pressed)){
-    //         player[1].velocity.x = 0 
+        
+        player1.update()
+        player2.update()
+        // Tried making a single general player control but keydown conflicts caused bugs
+        // So making do with individual repeated codes for both players (for now)
+        
+        // for(i in player){
+            //     if((player[1].position.x <= 0 && keys.left.pressed) || (player[1].position.x + player[1].property.width >= canvas.width && keys.right.pressed)){
+                //         player[1].velocity.x = 0 
     //         // This checks if the player hits the right or the left boundary and if it's still moving towards the bounday
     //         // If true, the player velocity is set to zero
     //         console.log('p2boundary');
@@ -247,8 +263,9 @@ window.addEventListener('keydown', (event) => {
         }
         case 'w': {
             keys.w.pressed = true
-            isp1jump = true
-            // lastKey1 = 'w'
+            // if(player1.property.isGround){
+            //     player1.velocity.y = -pjumpspeed
+            // }
             break
         }
         // Player 2
