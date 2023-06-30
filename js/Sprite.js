@@ -1,38 +1,58 @@
-import { angle } from "./script.js";
-import { canvas } from "./script.js";
-
 class Sprite {
-  constructor(gravity, { position, velocity, property /*, isPlayer*/ }) {
+  constructor(
+    gravity,
+    isPlayer,
+    { position, velocity, property /*, isPlayer*/ }
+  ) {
     this.gravity = gravity;
+    this.isPlayer = isPlayer;
     this.position = position;
     this.velocity = velocity;
     this.property = property;
     // this.isPlayer = isPlayer
   }
   draw(c) {
-    // Draws the sprite as a rectangle (as of yet)
-    c.fillStyle = this.property.color;
-    // c.fillStyle = this.isPlayer
-    // if (this.velocity.x > 0) {
-    //   c.save();
-    //   c.clearRect(0, 0, canvas.width, canvas.height);
-    //   c.rotate((angle * Math.PI) / 180);
-    //   c.fillRect(
-    //     this.position.x,
-    //     this.position.y,
-    //     this.property.width,
-    //     this.property.height
-    //   );
-    //   //   this.draw(c);
-    //   c.restore();
-    // } else {
-    c.fillRect(
-      this.position.x,
-      this.position.y,
-      this.property.width,
-      this.property.height
-    );
-    // }
+    if (this.isPlayer) {
+      // Player draw code
+      c.beginPath();
+      c.fillStyle = this.property.color.hat1;
+      c.arc(
+        this.position.x + this.property.width / 2,
+        this.position.y - 5,
+        5,
+        0,
+        2 * Math.PI
+      );
+      c.fill();
+      c.fillRect(this.position.x, this.position.y, this.property.width, 20);
+
+      c.fillStyle = this.property.color.skin;
+      c.fillRect(
+        this.position.x,
+        this.position.y + 20,
+        this.property.width,
+        this.property.height - 20
+      );
+      c.fillStyle = this.property.color.hat2;
+      c.fillRect(
+        this.position.x - 5,
+        this.position.y + 19,
+        this.property.width + 10,
+        10
+      );
+      c.closePath();
+    }
+    if (!this.isPlayer) {
+      console.log("rawewd");
+      // Enemy draw code
+      c.fillStyle = "red";
+      c.fillRect(
+        this.position.x,
+        this.position.y,
+        this.property.width,
+        this.property.height
+      );
+    }
   }
   update(c) {
     // updates each frame by clearing and drawing new sprites for each frame
@@ -45,7 +65,7 @@ class Sprite {
 
     if (this.position.y + this.property.height <= 480) {
       this.velocity.y += this.gravity;
-      // this.property.isGround = false
+      // this.propert y.isGround = false
       // Provies a {graviity} acceleration factor for each looping frame
       // setTimeout(() => {
       //     console.log('falseee');
